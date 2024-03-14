@@ -2,6 +2,8 @@ import sqlite3
 import random
 import pandas as pd
 
+"""This is a standalone file only used to scrape books and insert to DB.
+ This is NOT required for the project"""
 
 def connect_db():
     conn = sqlite3.connect('LIBRARY.db')
