@@ -53,7 +53,7 @@ class Library(QMainWindow):
         db.setDatabaseName('LIBRARY.db')
 
         # "self.db.open()" line attempt to open db and returns True if successul
-        if not self.db.open():
+        if not db.open():
             return   
               
         query = QSqlQueryModel()
