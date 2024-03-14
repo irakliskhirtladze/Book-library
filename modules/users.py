@@ -107,7 +107,7 @@ class Login(QMainWindow):
         self.log_ui.pushButton.clicked.connect(self.login)
 
     def switch_to_register(self) -> None:
-        """Allows an user to switch to registration screen"""
+        """Allows a user to switch to registration screen"""
         self.widget.setCurrentIndex(1)
 
         # Clears the info label when switching window

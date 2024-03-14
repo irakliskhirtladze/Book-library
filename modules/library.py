@@ -39,7 +39,7 @@ class Library(QMainWindow):
         self.widget.setCurrentIndex(0)
 
         with open('active_user.json', 'w') as file:
-            json.dump({'email':""}, file, indent=4)
+            json.dump({'email': ""}, file, indent=4)
 
         # Clears the info label when switching window
         clear_label([self.lib_ui.label_5, self.lib_ui.label_6, self.lib_ui.label_7])
@@ -52,16 +52,16 @@ class Library(QMainWindow):
         db = QSqlDatabase.addDatabase('QSQLITE')
         db.setDatabaseName('LIBRARY.db')
 
-        # "self.db.open()" line attempt to open db and returns True if successul
+        # "self.db.open()" line attempt to open db and returns True if successful
         if not db.open():
             return   
               
         query = QSqlQueryModel()
         query.setQuery("SELECT * FROM books")
-        self.tableView.setModel(query)
+        self.lib_ui.tableView.setModel(query)
 
-        self.tableView.horizontalHeader().setStyleSheet("background-color: transparent")
-        self.tableView.verticalHeader().setStyleSheet("QHeaderView::section { background-color: transparent; }")
+        self.lib_ui.tableView.horizontalHeader().setStyleSheet("background-color: transparent")
+        self.lib_ui.tableView.verticalHeader().setStyleSheet("QHeaderView::section { background-color: transparent; }")
 
     def show_average_page_num(self) -> None:
         """Shows average number of pages in the entire library"""
