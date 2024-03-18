@@ -190,14 +190,7 @@ QPushButton:pressed {
             </property>
             <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
-              <widget class="QTableView" name="tableView">
-               <property name="lineWidth">
-                <number>1</number>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustToContents</enum>
-               </property>
-              </widget>
+              <widget class="QTableWidget" name="tableWidget"/>
              </item>
             </layout>
            </widget>

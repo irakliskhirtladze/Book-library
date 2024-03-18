@@ -1,6 +1,7 @@
 import sqlite3
 import hashlib
 import json
+from modules.database import create_users_table, table_exists
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
@@ -34,6 +35,10 @@ class Register(QMainWindow):
         # Set up the user interface from Designer
         self.reg_ui = loadUi("ui/reg.ui", self)
         self.widget = widget
+
+        if not table_exists('users'):
+            create_users_table()
+
         # Connects buttons with screen switcher and registration methods
         self.reg_ui.pushButton_2.clicked.connect(self.switch_to_login)
         self.reg_ui.pushButton.clicked.connect(self.register)
@@ -50,18 +55,8 @@ class Register(QMainWindow):
         """Gets a database ready.
         Then checks for user input and tries to write credentials to DB.
         """
-
-        # Establish DB connection and create table if not yet present
-        conn = sqlite3.connect("LIBRARY.db")
+        conn = sqlite3.connect('LIBRARY.db')
         curs = conn.cursor()
-
-        curs.execute(
-            """CREATE TABLE IF NOT EXISTS "users" (
-            "email" TEXT PRIMARY KEY NOT NULL,
-            "password" TEXT NOT NULL
-            )"""
-        )
-
         curs.execute("SELECT email FROM users")
         rows = curs.fetchall()
         emails_in_db = [row[0] for row in rows]

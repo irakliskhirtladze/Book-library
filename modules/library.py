@@ -1,7 +1,7 @@
 import sqlite3
 import json
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtSql import QSqlDatabase, QSqlQueryModel
+from modules.database import scrape_books, table_exists
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
 from PyQt5.uic import loadUi
 
 
@@ -17,6 +17,9 @@ class Library(QMainWindow):
 
     def __init__(self, widget) -> None:
         super().__init__()
+
+        if not table_exists('books'):
+            scrape_books()
 
         # Set up the user interface from Designer
         self.lib_ui = loadUi("ui/library.ui", self)
@@ -44,24 +47,29 @@ class Library(QMainWindow):
         # Clears the info label when switching window
         clear_label([self.lib_ui.label_5, self.lib_ui.label_6, self.lib_ui.label_7])
         # Clears the table of all books
-        model = QSqlQueryModel()
-        self.lib_ui.tableView.setModel(model)
+        self.lib_ui.tableWidget.clearContents()
+        self.lib_ui.tableWidget.setRowCount(0)
+        self.lib_ui.tableWidget.setColumnCount(0)
 
     def show_all_books(self) -> None:
         """Reads DB and displays all books from it"""
-        db = QSqlDatabase.addDatabase('QSQLITE')
-        db.setDatabaseName('LIBRARY.db')
+        conn = sqlite3.connect("LIBRARY.db")
+        curs = conn.cursor()
+        curs.execute("SELECT * FROM books")
+        data = curs.fetchall()
 
-        # "self.db.open()" line attempt to open db and returns True if successful
-        if not db.open():
-            return   
-              
-        query = QSqlQueryModel()
-        query.setQuery("SELECT * FROM books")
-        self.lib_ui.tableView.setModel(query)
+        self.lib_ui.tableWidget.setRowCount(len(data))
+        self.lib_ui.tableWidget.setColumnCount(len(data[0]))
 
-        self.lib_ui.tableView.horizontalHeader().setStyleSheet("background-color: transparent")
-        self.lib_ui.tableView.verticalHeader().setStyleSheet("QHeaderView::section { background-color: transparent; }")
+        # Populate the table with the fetched data
+        for row_num, row_data in enumerate(data):
+            for col_num, cell_data in enumerate(row_data):
+                item = QTableWidgetItem(str(cell_data))
+                self.lib_ui.tableWidget.setItem(row_num, col_num, item)
+
+        self.lib_ui.tableWidget.horizontalHeader().setStyleSheet("background-color: transparent")
+        self.lib_ui.tableWidget.verticalHeader().setStyleSheet("QHeaderView::section { background-color: transparent; }")
+        conn.close()
 
     def show_average_page_num(self) -> None:
         """Shows average number of pages in the entire library"""
