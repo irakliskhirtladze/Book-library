@@ -6,9 +6,12 @@ from modules.users import Register, Login
 from modules.library import Library
 
 
-def save_user_logged_in() -> None:
-    with open("active_user.json", "w") as json_file:
+def reset_current_events() -> None:
+    with open("utils/current_user.json", "w") as json_file:
         json.dump({"email": ""}, json_file, indent=4)
+
+    with open("utils/current_table.json", "w") as json_file:
+        json.dump({"current_table": ""}, json_file, indent=4)
 
 
 if __name__ == "__main__":
@@ -22,10 +25,10 @@ if __name__ == "__main__":
     widget.addWidget(regWindow)
     widget.addWidget(libWindow)
 
-    widget.setWindowTitle("TBC Academy")
+    widget.setWindowTitle("Library")
     widget.setWindowIcon(QIcon("assets/books.png"))
     widget.show()
 
-    app.aboutToQuit.connect(save_user_logged_in)
+    app.aboutToQuit.connect(reset_current_events)
 
     sys.exit(app.exec_())

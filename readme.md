@@ -25,8 +25,6 @@ This is used to display current user's email on the library page of the app.
 In the future I might add user's name, last name and more info to the file for other purposes.
 
 ### Requirements
-Python 3.x (3.9 recommended)
-
-PyQt5==5.15.9
-
-pandas==2.2.1
+- Python 3.x (3.9 recommended)
+- PyQt5==5.15.9
+- pandas==2.2.1

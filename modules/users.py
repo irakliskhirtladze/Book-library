@@ -1,7 +1,7 @@
 import sqlite3
 import hashlib
 import json
-from modules.database import create_users_table, table_exists
+from modules.database import DatabaseManager
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
@@ -16,13 +16,10 @@ def check_password(entered_password, stored_password) -> bool:
     return hash_password(entered_password) == stored_password
 
 
-def read_db() -> dict:
-    """Opens and extracts data from database"""
-    conn = sqlite3.connect("LIBRARY.db")
-    curs = conn.cursor()
-    curs.execute("SELECT * FROM users")
-    rows = curs.fetchall()
-    conn.close()
+def read_users_table() -> dict:
+    """Opens and extracts data from users table"""
+    db_manager = DatabaseManager('LIBRARY.db')
+    rows = db_manager.load_data('users')
     return {row[0]: row[1] for row in rows}
 
 
@@ -36,8 +33,7 @@ class Register(QMainWindow):
         self.reg_ui = loadUi("ui/reg.ui", self)
         self.widget = widget
 
-        if not table_exists('users'):
-            create_users_table()
+        self.db_manager = DatabaseManager('LIBRARY.db')
 
         # Connects buttons with screen switcher and registration methods
         self.reg_ui.pushButton_2.clicked.connect(self.switch_to_login)
@@ -52,14 +48,10 @@ class Register(QMainWindow):
         self.reg_ui.label_4.setText("")
 
     def register(self) -> None:
-        """Gets a database ready.
-        Then checks for user input and tries to write credentials to DB.
+        """Checks for user input and if validated, writes credentials to DB.
         """
-        conn = sqlite3.connect('LIBRARY.db')
-        curs = conn.cursor()
-        curs.execute("SELECT email FROM users")
-        rows = curs.fetchall()
-        emails_in_db = [row[0] for row in rows]
+        email_rows = self.db_manager.search('users', ['email'])
+        emails_in_db = [row[0] for row in email_rows]
 
         # Reads user input
         email = self.reg_ui.lineEdit.text()
@@ -69,20 +61,23 @@ class Register(QMainWindow):
         if email in emails_in_db:
             self.reg_ui.label_4.setStyleSheet("color: red; background-color:transparent")
             self.reg_ui.label_4.setText("This email is already registered")
+
         elif "@" not in email:
             self.reg_ui.label_4.setStyleSheet("color: red; background-color:transparent")
             self.reg_ui.label_4.setText("Invalid email")
+
         elif len(password) < 4:
             self.reg_ui.label_4.setStyleSheet("color: red; background-color:transparent")
             self.reg_ui.label_4.setText("Password must be at least 4 characters")
+
         else:
             try:  # Writing to DB can fail when it's used concurrently
                 hashed_password = hash_password(password)
-                curs.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, hashed_password))
-                conn.commit()
+                self.db_manager.add_record('users', email, hashed_password)
+
                 self.reg_ui.label_4.setStyleSheet("color: green; background-color:transparent")
                 self.reg_ui.label_4.setText("Registration successful!")
-                conn.close()
+
             except sqlite3.OperationalError:
                 self.reg_ui.label_4.setStyleSheet("color: red; background-color:transparent")
                 self.reg_ui.label_4.setText("Could not save to database. Close if it is open!")
@@ -117,16 +112,18 @@ class Login(QMainWindow):
         password = self.log_ui.lineEdit_2.text()
 
         # Checks login rules and tries to login
-        if email not in read_db():
+        if email not in read_users_table():
             self.log_ui.label_4.setStyleSheet("color: red; background-color:transparent")
             self.log_ui.label_4.setText("No such email found!")
-        elif not check_password(password, read_db()[email]):
+
+        elif not check_password(password, read_users_table()[email]):
             self.log_ui.label_4.setStyleSheet("color: red; background-color:transparent")
             self.log_ui.label_4.setText("Password is incorrect!")
+
         else:
             try:
-                # Writes logged in user to json file to be read by Library class
-                with open('active_user.json', 'w') as file:
+                # Writes logged-in user to json file to be read by Library class
+                with open('utils/current_user.json', 'w') as file:
                     json.dump({'email': email}, file, indent=4)
 
                 # Switches active widget to library
