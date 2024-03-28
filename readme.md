@@ -1,25 +1,27 @@
-# A virtual book library using PyQt5
+# A Virtual Book Library using PyQt5
+## Note
+Please be aware that the initial run of the application may take longer as it scrapes and stores books for the first time.
 
-### Note
-First run of the app takes longer, as it scrapes and stores books for the first time
+## Description
+This project is divided into several parts:
 
-### Description
-This project is divided into few parts:
+- main.py: Responsible for importing necessary modules and running the application.
 
-"main.py" is responsible to import necessary modules and run the app.
+- modules/users.py: Handles user registration and login.
 
-In modules folder I have "users.py", which is responsible handling user registration and login.
+- modules/database.py: Manages the database with common CRUD methods.
 
-"database.py" is a database manager with common CRUD methods.
+- modules/library.py: Contains features to read books from the database, display them in the GUI, and add or remove favorite books.
 
-And "library.py" module contains features to read books from DB, to display them in GUI, add and remove favorite books.
+- Access to the library requires user registration followed by login.
 
-To access the library, the user must register and then log in.
-
-
-### Requirements
+## Requirements
 - Python 3.x (3.9 recommended)
 - PyQt5==5.15.9
-- pandas==2.2.1
+- pandas==1.2.2
 
-to install required packages run in terminal: pip install -requirements.txt
+To install the required packages, run the following command in the terminal:
+
+```` bash
+pip install -r requirements.txt
+````
