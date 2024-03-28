@@ -26,7 +26,7 @@ if __name__ == "__main__":
     widget.addWidget(libWindow)
 
     widget.setWindowTitle("Library")
-    widget.setWindowIcon(QIcon("assets/books.png"))
+    widget.setWindowIcon(QIcon("assets/book.png"))
     widget.show()
 
     app.aboutToQuit.connect(reset_current_events)
